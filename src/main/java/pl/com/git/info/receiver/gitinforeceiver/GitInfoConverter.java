@@ -9,8 +9,10 @@ import java.time.format.DateTimeFormatter;
 
 public final class GitInfoConverter {
 
+    private static final GitInfoResponseBuilder builder = new GitInfoResponseBuilder();
+
     public static GitInfoResponse convert(GHRepository repository) throws IOException {
-        return new GitInfoResponseBuilder().
+        return builder.
                 setFullName(repository.getFullName()).
                 setDescription(repository.getDescription()).
                 setCloneUrl(repository.getUrl().getPath()).
@@ -20,7 +22,10 @@ public final class GitInfoConverter {
     }
 
     private static String convertFormatedDate(GHRepository repository) throws IOException {
-        return LocalDateTime.ofInstant(repository.getCreatedAt().toInstant(), ZoneId.systemDefault()).format(DateTimeFormatter.ISO_DATE_TIME).toString();
+        return LocalDateTime.ofInstant(repository.getCreatedAt().toInstant(), ZoneId.systemDefault()).format(DateTimeFormatter.ISO_DATE_TIME);
+    }
+
+    private GitInfoConverter() {
     }
 
 }
