@@ -46,4 +46,14 @@ public class GitInfoControllerTest {
     public void userNotFound() throws Exception {
         mockMvc.perform(get("/repositories/" + userName + "3/" + repositoryName)).andExpect(status().is4xxClientError());
     }
+
+    @Test
+    public void perform20Requests() throws Exception {
+        long start = System.currentTimeMillis();
+        for (int i = 0; i < 20; i++) {
+            mockMvc.perform(get("/repositories/" + userName + "/" + repositoryName)).andExpect(status().isOk());
+        }
+        long finish = System.currentTimeMillis();
+        System.out.println("Time:   " + (finish - start));
+    }
 }
