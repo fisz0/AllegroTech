@@ -14,7 +14,6 @@ import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
-import java.util.concurrent.Callable;
 
 @RestController
 public class GitInfoController {
@@ -33,25 +32,22 @@ public class GitInfoController {
     }
 
     @GetMapping("/repositories/{username}/{repository_name}")
-    public Callable<ResponseEntity<?>> getRepository(@PathVariable("username") String userName, @PathVariable("repository_name") String repositoryName) throws IOException {
-        Callable<ResponseEntity<?>> responseEntity = () -> {
+    public ResponseEntity getRepository(@PathVariable("username") String userName, @PathVariable("repository_name") String repositoryName) throws IOException {
+        GHUser user;
+        try {
+            user = gitHub.getUser(userName);
+        } catch (GHFileNotFoundException e) {
+            LOGGER.error("User not found");
+            return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
+        }
 
-            GHUser user = null;
-            try {
-                user = gitHub.getUser(userName);
-            } catch (GHFileNotFoundException e) {
-                return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
-            }
-
-            GHRepository repository = user.getRepository(repositoryName);
-            if (repository != null) {
-                GitInfoResponse response = GitInfoConverter.convert(repository);
-                return new ResponseEntity<>(response, HttpStatus.OK);
-            } else {
-                return new ResponseEntity<>("Repository not found", HttpStatus.NOT_FOUND);
-            }
-        };
-        return responseEntity;
+        GHRepository repository = user.getRepository(repositoryName);
+        if (repository == null) {
+            LOGGER.error("Repository not found");
+            return new ResponseEntity<>("Repository not found", HttpStatus.NOT_FOUND);
+        }
+        LOGGER.info("Returninig repository");
+        return new ResponseEntity<>(GitInfoConverter.convert(repository), HttpStatus.OK);
     }
 }
 

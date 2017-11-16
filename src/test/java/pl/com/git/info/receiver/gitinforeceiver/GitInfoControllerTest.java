@@ -1,6 +1,5 @@
 package pl.com.git.info.receiver.gitinforeceiver;
 
-import io.restassured.RestAssured;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -11,10 +10,6 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.context.WebApplicationContext;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.hamcrest.Matchers.lessThan;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
@@ -50,37 +45,5 @@ public class GitInfoControllerTest {
     @Test
     public void userNotFound() throws Exception {
         mockMvc.perform(get("/repositories/" + userName + "3/" + repositoryName)).andExpect(status().is4xxClientError());
-    }
-
-    @Test
-    public void test20RequestsResponseTime() {
-        List<Long> results = new ArrayList<>();
-        for (int i = 0; i < 10; i++) {
-            Long l = get20RequestsResponseTime();
-            results.add(l);
-            System.out.println(l);
-        }
-
-        Long s = 0L;
-        for (Long l : results) {
-            System.out.println(l);
-            s += l;
-        }
-
-
-        System.out.println("DUPA  " +s / 10);
-    }
-
-    private Long get20RequestsResponseTime() {
-        Long start = System.currentTimeMillis();
-        for (int i = 0; i < 20; i++) {
-            RestAssured.given().
-                    when().
-                    get("http://localhost:8080/fisz0/AllegroTech").
-                    then().
-                    assertThat().time(lessThan(1000L));
-        }
-        Long finish = System.currentTimeMillis();
-        return finish - start;
     }
 }
